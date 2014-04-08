@@ -1,4 +1,4 @@
-all: parsing
+all: evaluation
 
-parsing: parsing.c lib/mpc.c
-	gcc -std=c99 -ledit -lm -o parsing parsing.c lib/mpc.c
+parsing: evaluation.c lib/mpc.c
+	gcc -std=c99 -ledit -lm -o evaluation evaluation.c lib/mpc.c
