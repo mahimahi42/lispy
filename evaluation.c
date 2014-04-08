@@ -32,6 +32,9 @@ void add_history(char* unused) {}
 
 #endif
 
+long eval(mpc_ast_t*);
+long eval_op(long, char*, long);
+
 int main(int argc, char** argv) {
 	/* Create parsers */
 	mpc_parser_t* Number   = mpc_new("number");
