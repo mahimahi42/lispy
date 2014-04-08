@@ -143,36 +143,28 @@ lval* lval_add(lval* v, lval* x) {
 lval* lval_copy(lval* v) {
     lval* x = malloc(sizeof(lval));
     x->type = v->type;
-
+    
     switch (v->type) {
-        /* Copy functions and numbers directly */
-        case LVAL_FUN:
-            x->fun = v->fun;
-            break;
-        case LVAL_NUM:
-            x->num = v->num;
-            break;
-
-        /* Copy strings with malloc and strcpy */
-        case LVAL_ERR:
-            x->err = malloc(strlen(v->err) + 1);
-            strcpy(x->err, v->err);
-            break;
-        case LVAL_SYM:
-            x->sym = malloc(strlen(v->sym) + 1);
-            strcpy(x->err, v->err);
-            break;
-
-        /* Copy expressions by copying each sub-expression */
-        case LVAL_SEXPR:
-        case LVAL_QEXPR:
-            x->count = v->count;
-            x->cell  = malloc(sizeof(lval*) * x->count);
-            for (int i = 0; i < x->count; i++) {
-                x->cell[i] = lval_copy(v->cell[i]);
-            }
-            break;
+      
+      /* Copy Functions and Numbers Directly */
+      case LVAL_FUN: x->fun = v->fun; break;
+      case LVAL_NUM: x->num = v->num; break;
+      
+      /* Copy Strings using malloc and strcpy */
+      case LVAL_ERR: x->err = malloc(strlen(v->err) + 1); strcpy(x->err, v->err); break;
+      case LVAL_SYM: x->sym = malloc(strlen(v->sym) + 1); strcpy(x->sym, v->sym); break;
+      
+      /* Copy Lists by copying each sub-expression */
+      case LVAL_SEXPR:
+      case LVAL_QEXPR:
+        x->count = v->count;
+        x->cell = malloc(sizeof(lval*) * x->count);
+        for (int i = 0; i < x->count; i++) {
+          x->cell[i] = lval_copy(v->cell[i]);
+        }
+      break;
     }
+    
     return x;
 }
 
@@ -182,7 +174,9 @@ lval* lenv_get(lenv* e, lval* k) {
     for (int i = 0; i < e->count; i++) {
         /* If the stored string matches the symbol string
         *  then return a copy of the value */
-        if (strcmp(e->syms[i], k->sym) == 0) { return lval_copy(e->vals[i]); }
+        if (strcmp(e->syms[i], k->sym) == 0) {
+            return lval_copy(e->vals[i]); 
+        }
     }
     /* Otherwise, return an error */
     return lval_err("Unbound symbol '%s'", k->sym);
@@ -197,7 +191,7 @@ void lenv_put(lenv* e, lval* k, lval* v) {
         if (strcmp(e->syms[i], k->sym) == 0) {
             lval_del(e->vals[i]);
             e->vals[i] = lval_copy(v);
-            e->syms[i] = realloc(e->syms[i], strlen(k->sym) + 1);
+            e->syms[i] = realloc(e->syms[i], strlen(k->sym)+1);
             strcpy(e->syms[i], k->sym);
             return;
         }
@@ -206,7 +200,7 @@ void lenv_put(lenv* e, lval* k, lval* v) {
     /* If it's not found, allocate space for it */
     e->count++;
     e->vals = realloc(e->vals, sizeof(lval*) * e->count);
-    e->syms = realloc(e->vals, sizeof(char*) * e->count);
+    e->syms = realloc(e->syms, sizeof(char*) * e->count);
 
     /* Copy the provided lval and symbol string */
     e->vals[e->count-1] = lval_copy(v);
