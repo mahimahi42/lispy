@@ -206,7 +206,7 @@ void lenv_put(lenv* e, lval* k, lval* v) {
     /* If it's not found, allocate space for it */
     e->count++;
     e->vals = realloc(e->vals, sizeof(lval*) * e->count);
-    e->syms = realloc(e->syms, sizeof(char*) * e->count);
+    e->syms = realloc(e->vals, sizeof(char*) * e->count);
 
     /* Copy the provided lval and symbol string */
     e->vals[e->count-1] = lval_copy(v);
