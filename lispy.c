@@ -1,51 +1,4 @@
-#include "lib/mpc.h"
-
-/* Compile these functions if we're on Windows */
-#ifdef _WIN32
-
-static char buffer[2048];
-
-char* readline(char* prompt) {
-	fputs(prompt, stdout);
-	fgets(buffer, 2048, stdin);
-	char* cpy = malloc(strlen(buffer) + 1);
-	strcpy(cpy, buffer);
-	cpy[strlen(cpy) - 1] = "\0";
-	return cpy;
-}
-
-void add_history(char* unused) {}
-
-#elif __APPLE__
-
-#include <editline/readline.h>
-
-#else
-
-#include <editline/readline.h>
-#include <editline/history.h>
-
-#endif
-
-/*******
-* Macros
-*******/
-#define LASSERT(args, cond, err) if (!(cond)) { lval_del(args); return lval_err(err); }
-
-/* lval possible types */
-enum { LVAL_NUM, LVAL_ERR, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR };
-
-/* Lisp Value struct */
-typedef struct lval {
-    int type;
-    long num;
-    /* String data for err and sym types */
-    char* err;
-    char* sym;
-    /* Count and pointer to a list of lvals */
-    int count;
-    struct lval** cell;
-} lval;
+#include "lispy.h"
 
 /* Create a new lval number */
 lval* lval_num(long x) {
@@ -127,8 +80,6 @@ lval* lval_add(lval* v, lval* x) {
     v->cell[v->count-1] = x;
     return v;
 }
-
-void lval_print(lval*);
 
 /* Print an lval expression */
 void lval_expr_print(lval* v, char open, char close) {
@@ -229,9 +180,6 @@ lval* lval_take(lval* v, int i) {
     return x;
 }
 
-lval* lval_eval_sexpr(lval*);
-lval* builtin_op(lval*, char*);
-
 /* Evaluate an lval */
 lval* lval_eval(lval* v) {
     /* Eval s-exprs */
@@ -239,8 +187,6 @@ lval* lval_eval(lval* v) {
     /* Other types stay the same, so just give them back */
     return v;
 }
-
-lval* builtin(lval*, char*);
 
 /* Evaluate an s-expr */
 lval* lval_eval_sexpr(lval* v) {
@@ -358,8 +304,7 @@ lval* builtin_eval(lval* a) {
     return lval_eval(x);
 }
 
-lval* lval_join(lval*, lval*);
-
+/* Builtin function for `join` */
 lval* builtin_join(lval* a) {
     for (int i = 0; i < a->count; i++) {
         LASSERT(a, (a->cell[0]->type == LVAL_QEXPR), "Function 'join' passed incorrect type");
@@ -375,6 +320,7 @@ lval* builtin_join(lval* a) {
     return x;
 }
 
+/* Join two lvals together */
 lval* lval_join(lval* x, lval* y) {
     /* For each call in `y` add it to `x` */
     while (y->count) {
@@ -386,6 +332,7 @@ lval* lval_join(lval* x, lval* y) {
     return x;
 }
 
+/* Call the correct builtin function */
 lval* builtin(lval* a, char* func) {
     if (strcmp("list", func) == 0) { return builtin_list(a); }
     if (strcmp("head", func) == 0) { return builtin_head(a); }
