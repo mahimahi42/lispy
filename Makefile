@@ -1,4 +1,4 @@
-all: evaluation
+all: lispy
 
-evaluation: evaluation.c lib/mpc.c
-	gcc -std=c99 -ledit -lm -o evaluation evaluation.c lib/mpc.c
+lispy: lispy.c lib/mpc.c
+	gcc -std=c99 -ledit -lm -o lispy lispy.c lib/mpc.c
