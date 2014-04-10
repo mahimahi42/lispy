@@ -399,7 +399,7 @@ lval* lval_read(mpc_ast_t* t) {
         if (strcmp(t->children[i]->contents, "}") == 0) { continue; }
         if (strcmp(t->children[i]->tag, "regex") == 0)  { continue; }
         /* If comment, ignore */
-        if (strstr(t->tag, "comment")) { continue; }
+        if (strstr(t->children[i]->tag, "comment")) { continue; }
         x = lval_add(x, lval_read(t->children[i]));
     }
 
@@ -906,22 +906,22 @@ int main(int argc, char** argv) {
 
 	/* Define parsers */
 	mpca_lang(MPC_LANG_DEFAULT,
-		"                                              \
-          number  : /-?[0-9]+/ ;                       \
-          symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/ ; \
-          string  : /\"(\\\\.|[^\"])*\"/ ;             \
-          comment : /;[^\\r\\n]*/ ;                    \
-          sexpr   : '(' <expr>* ')' ;                  \
-          qexpr   : '{' <expr>* '}' ;                  \
-          expr    : <number>  | <symbol> | <string>    \
-                  | <comment> | <sexpr>  | <qexpr>;    \
-          lispy   : /^/ <expr>* /$/ ;                  \
-        ",
-		Number, Symbol, String, Comment, Sexpr, Qexpr, Expr, Lispy);
+      "                                              \
+        number  : /-?[0-9]+/ ;                       \
+        symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/ ; \
+        string  : /\"(\\\\.|[^\"])*\"/ ;             \
+        comment : /;[^\\r\\n]*/ ;                    \
+        sexpr   : '(' <expr>* ')' ;                  \
+        qexpr   : '{' <expr>* '}' ;                  \
+        expr    : <number>  | <symbol> | <string>    \
+                | <comment> | <sexpr>  | <qexpr>;    \
+        lispy   : /^/ <expr>* /$/ ;                  \
+      ",
+      Number, Symbol, String, Comment, Sexpr, Qexpr, Expr, Lispy);
 
 
 	/* Print Version and Exit Information */
-	puts("Lispy Version 0.0.2.3.0");
+	puts("Lispy Version 0.0.3.0.0");
 	puts("Press Ctrl+c to Exit\n");
 
     /* Create a new environment */

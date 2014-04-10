@@ -1,0 +1,71 @@
+; Atoms
+(def {nil} {})
+(def {true} 1)
+(def {false} 0)
+
+; Function Definitions
+(def {fun} (\ {f b} {
+	def (head f) (\ (tail f) b)
+}))
+
+; Unpack list for function
+(fun {unpack f l} {
+	eval (join (list f) l)
+})
+
+; Pack list for function
+(fun {pack f & xs} {f xs})
+
+; Curried and uncurried calling
+(def {curry} {unpack})
+(def {uncurry} {pack})
+
+; Perform several things in sequence
+(fun {do & l} {
+	if (== l {})
+		{{}}
+		{last l}
+})
+
+; Open a new scope
+(fun {let b} {
+	((\ {_} b) ())
+})
+
+; Logical functions
+(fun {not x}   {- 1 x})
+(fun {or x y}  {+ x y})
+(fun {and x y} {* x y})
+
+; Misc functions
+(fun {flip f a b} {f b a})
+(fun {ghost & xs} {eval xs})
+(fun {comp f g x} {f (g x)})
+
+;;;;;;;;;;;;;;;;
+; List functions
+;;;;;;;;;;;;;;;;
+
+; First, second, or third item in a list
+(fun {fst l} { eval (head l) })
+(fun {snd l} { eval (head (tail l)) })
+(fun {trd l} { eval (head (tail (tail l))) })
+
+; List length
+(fun {len l} {
+	if (== 1 {})
+		{0}
+		{+ 1 (len (tail l))}
+})
+
+; Nth item in list
+(fun {nth n l} {
+	if (== n 0)
+		{fst l}
+		{nth (- n 1) (tail l)}
+})
+
+; Last item in list
+(fun {last l} {nth (- (len l) 1) l})
+
+; Take N items
