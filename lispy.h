@@ -131,6 +131,7 @@ lval* lval_take(lval*, int);
 lval* lval_eval(lenv*, lval*);
 lval* lval_eval_sexpr(lenv*, lval*);
 lval* lval_call(lenv*, lval*, lval*);
+int   lval_eq(lval*, lval*);
 
 lval* builtin_op(lenv*, lval*, char*);
 lval* builtin_add(lenv*, lval*);
@@ -147,5 +148,14 @@ lval* builtin_var(lenv*, lval*, char*);
 lval* builtin_def(lenv*, lval*);
 lval* builtin_put(lenv*, lval*);
 lval* builtin_lambda(lenv*, lval*);
+lval* builtin_ord(lenv*, lval*, char*);
+lval* builtin_gt(lenv*, lval*);
+lval* builtin_lt(lenv*, lval*);
+lval* builtin_ge(lenv*, lval*);
+lval* builtin_le(lenv*, lval*);
+lval* builtin_cmp(lenv*, lval*, char*);
+lval* builtin_eq(lenv*, lval*);
+lval* builtin_ne(lenv*, lval*);
+lval* builtin_if(lenv*, lval*);
 
 #endif
